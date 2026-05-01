@@ -7,7 +7,7 @@
 
 function PricingPage() {
   const [, , t] = window.i18n.useLang();
-  const [billing, setBilling] = React.useState('annual'); // 'monthly' | 'annual'
+  const [billing, setBilling] = React.useState('monthly'); // 'monthly' | 'annual'
 
   return (
     <section className="lg-pricing">
