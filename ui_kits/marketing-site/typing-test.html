@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test de mecanografía — Lingua</title>
+  <link rel="icon" type="image/svg+xml" href="assets/lingua-mark.svg" />
+  <link rel="stylesheet" href="../../colors_and_type.css" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* ===== Typing test ===== */
+    .tt-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 56px 24px 80px;
+      max-width: 1100px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .tt-eyebrow { font: var(--type-eyebrow); letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--color-brand-blue); margin: 0 0 14px; }
+    .tt-h { font: 600 44px/1.04 var(--font-sans); letter-spacing: var(--tracking-tight); margin: 0 0 12px; max-width: 22ch; text-wrap: balance; }
+    .tt-h em { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--color-brand-blue); }
+    .tt-sub { font: 400 17px/1.5 var(--font-sans); color: var(--color-fg-ink-2); max-width: 52ch; margin: 0 auto 36px; }
+
+    /* Stage */
+    .tt-stage {
+      width: 100%;
+      max-width: 760px;
+      background: #fff;
+      border: 1px solid var(--color-border);
+      border-radius: 24px;
+      box-shadow: var(--shadow-card-cream);
+      padding: 32px 40px 36px;
+      position: relative;
+    }
+    .tt-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      font: 500 12px/1 var(--font-mono);
+      color: var(--color-fg-muted);
+      letter-spacing: 0.04em;
+      margin-bottom: 24px;
+    }
+    .tt-meta__dot {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--color-fg-faint);
+      vertical-align: -0.05em; margin-right: 8px;
+      transition: background .2s;
+    }
+    .tt-meta.is-running .tt-meta__dot { background: var(--color-brand-blue); animation: tt-pulse 1.4s ease-out infinite; }
+    .tt-meta.is-done .tt-meta__dot { background: var(--color-success); animation: none; }
+    @keyframes tt-pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(55,145,191,0.55); }
+      70%  { box-shadow: 0 0 0 12px rgba(55,145,191,0); }
+      100% { box-shadow: 0 0 0 0 rgba(55,145,191,0); }
+    }
+
+    /* The phrase — fixed 2 lines */
+    .tt-phrase {
+      font: 500 24px/1.55 var(--font-sans);
+      letter-spacing: var(--tracking-snug);
+      color: var(--color-fg-ink);
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto;
+      cursor: text;
+      user-select: none;
+      outline: none;
+      position: relative;
+      word-spacing: 0.05em;
+    }
+    .tt-phrase__word { display: inline-block; white-space: nowrap; }
+    .tt-phrase__char { position: relative; transition: color .08s; color: #b8b1a3; display: inline-block; }
+    .tt-phrase__char.is-done { color: var(--color-fg-ink); }
+    /* Current (next-to-type) character keeps the gray untyped color so users
+       can see exactly which letter to hit next. The blinking caret marker
+       below still pins it. */
+    .tt-phrase__char.is-current::before {
+      content: '';
+      position: absolute;
+      left: -1px; top: 8%;
+      width: 2px; height: 84%;
+      background: var(--color-brand-blue);
+      animation: tt-caret 1s steps(2) infinite;
+    }
+    .tt-phrase.is-done .tt-phrase__char.is-current::before { display: none; }
+    @keyframes tt-caret { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+
+    /* Shake feedback when wrong key pressed */
+    .tt-phrase.is-wrong { animation: tt-shake .22s ease-out; }
+    @keyframes tt-shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+    .tt-phrase.is-wrong .tt-phrase__char.is-current { color: var(--color-danger); }
+
+    .tt-hint {
+      margin-top: 24px;
+      font: var(--type-caption);
+      color: var(--color-fg-muted);
+    }
+    .tt-hint kbd {
+      display: inline-block;
+      font: 500 12px/1 var(--font-mono);
+      background: var(--color-bg-cream);
+      border: 1px solid var(--color-border);
+      border-bottom-width: 2px;
+      border-radius: 6px;
+      padding: 4px 8px;
+      color: var(--color-fg-ink-2);
+      vertical-align: 1px;
+    }
+
+    /* Result panel */
+    .tt-result {
+      width: 100%;
+      max-width: 920px;
+      margin-top: 24px;
+      padding: 40px 48px;
+      background: var(--color-bg-cream-2);
+      border-radius: 28px;
+      display: none;
+    }
+    .tt-result.is-shown { display: block; animation: tt-fade .4s ease-out; }
+    @keyframes tt-fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    .tt-result__head {
+      display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;
+      justify-content: space-between;
+      margin-bottom: 28px; text-align: left;
+    }
+    .tt-result__col { display: flex; flex-direction: column; }
+    .tt-result__big {
+      font: 600 88px/0.95 var(--font-sans);
+      letter-spacing: var(--tracking-tight);
+      color: var(--color-fg-ink);
+    }
+    .tt-result__big--lingua {
+      color: var(--color-brand-blue);
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 400;
+    }
+    .tt-result__unit { font: 500 18px var(--font-sans); color: var(--color-fg-muted); }
+    .tt-result__caption {
+      margin: 10px 0 0;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 400;
+      font-size: 22px;
+      line-height: 1.35;
+      color: var(--color-brand-blue-deep);
+      max-width: 26ch;
+      text-wrap: pretty;
+    }
+    .tt-result__caption--right { text-align: right; margin-left: auto; }
+
+    .tt-result__scenario {
+      margin: 8px 0 0;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 400;
+      font-size: 22px;
+      line-height: 1.35;
+      color: var(--color-brand-blue-deep);
+      max-width: 26ch;
+      text-wrap: pretty;
+    }
+
+    /* Comparison bars */
+    .tt-bars { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+    .tt-bar { text-align: left; }
+    .tt-bar__label {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font: 500 14px var(--font-sans);
+      color: var(--color-fg-ink-2);
+      margin-bottom: 6px;
+    }
+    .tt-bar__num { font: 500 13px/1 var(--font-mono); color: var(--color-fg-muted); }
+    .tt-bar__track {
+      height: 14px; border-radius: 999px;
+      background: rgba(14,17,22,0.06);
+      overflow: hidden; position: relative;
+    }
+    .tt-bar__fill {
+      height: 100%;
+      border-radius: 999px;
+      transform-origin: left center;
+      transform: scaleX(0);
+      animation: tt-grow 1s cubic-bezier(.22,.94,.36,1) forwards;
+    }
+    @keyframes tt-grow { to { transform: scaleX(1); } }
+    .tt-bar__fill--you { background: #c4bcaa; }
+    .tt-bar__fill--avg { background: #8a93a3; }
+    .tt-bar__fill--lingua {
+      background: linear-gradient(90deg, var(--color-brand-blue), var(--color-accent-glow));
+    }
+
+    .tt-result__cta { display: flex; justify-content: center; gap: 12px; margin-top: 8px; }
+    .tt-result__cta a { border: none; }
+
+    /* Slow scroll-down cue — appears under the typed phrase once the test
+       is done. Fades in over a long beat, then loops a very slow rise/fall
+       so it whispers rather than nags. */
+    .tt-scrollcue {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      margin: 24px auto 0;
+      padding: 8px 14px;
+      background: transparent; border: none;
+      color: var(--color-fg-muted);
+      font: 500 13px/1.2 var(--font-sans);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      opacity: 0;
+      animation: tt-scrollcue-in 1.4s 1.0s ease-out both;
+    }
+    .tt-scrollcue:hover { color: var(--color-brand-blue); }
+    .tt-scrollcue__label { display: block; }
+    .tt-scrollcue__arrow {
+      display: inline-flex;
+      animation: tt-scrollcue-bob 3.4s 2.4s ease-in-out infinite;
+    }
+    @keyframes tt-scrollcue-in {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: none; }
+    }
+    @keyframes tt-scrollcue-bob {
+      0%, 100% { transform: translateY(0);    opacity: 0.6; }
+      50%      { transform: translateY(8px);  opacity: 1;   }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .tt-scrollcue { animation: none; opacity: 1; }
+      .tt-scrollcue__arrow { animation: none; }
+    }
+
+    /* Time-saved second line — the closer */
+    .tt-saved {
+      margin: 0 0 28px;
+      padding: 20px 24px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid var(--color-border);
+      font: 500 17px/1.6 var(--font-sans);
+      color: var(--color-fg-ink-2);
+      text-align: left;
+      text-wrap: pretty;
+    }
+    .tt-saved strong { color: var(--color-brand-blue-deep); font-weight: 600; }
+    .tt-saved__big { font-weight: 600; color: var(--color-fg-ink); }
+
+    /* Weekly-savings calculator */
+    .tt-calc {
+      margin: 0 0 28px;
+      padding: 28px 32px;
+      border-radius: 24px;
+      background: var(--color-bg-cream);
+      border: 1px solid var(--color-border);
+      color: var(--color-fg-ink);
+      text-align: left;
+    }
+    .tt-calc__h {
+      font: var(--type-eyebrow);
+      letter-spacing: var(--tracking-eyebrow);
+      text-transform: uppercase;
+      color: var(--color-brand-blue);
+      margin: 0 0 6px;
+    }
+    .tt-calc__lede {
+      font: 500 19px/1.4 var(--font-sans);
+      letter-spacing: var(--tracking-snug);
+      margin: 0 0 22px;
+      color: var(--color-fg-ink);
+      text-wrap: pretty;
+    }
+    .tt-calc__lede em { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--color-brand-blue-deep); }
+
+    .tt-calc__row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: center;
+    }
+    .tt-calc__slider-wrap { display: flex; flex-direction: column; gap: 8px; }
+    .tt-calc__slider-label {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font: 500 13px var(--font-sans);
+      color: var(--color-fg-muted);
+      letter-spacing: 0.02em;
+    }
+    .tt-calc__slider-val {
+      font: 500 14px/1 var(--font-mono);
+      color: var(--color-fg-ink);
+    }
+    .tt-calc__slider {
+      -webkit-appearance: none; appearance: none;
+      width: 100%;
+      height: 6px;
+      background: rgba(14,17,22,0.10);
+      border-radius: 999px;
+      outline: none;
+      cursor: pointer;
+    }
+    .tt-calc__slider::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--color-brand-blue);
+      box-shadow: 0 0 0 4px rgba(55,145,191,0.20), 0 4px 12px rgba(14,17,22,0.15);
+      cursor: pointer;
+      border: 2px solid #fff;
+      transition: transform .15s;
+    }
+    .tt-calc__slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
+    .tt-calc__slider::-moz-range-thumb {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--color-brand-blue);
+      border: 2px solid #fff;
+      cursor: pointer;
+    }
+    .tt-calc__ticks {
+      display: flex; justify-content: space-between;
+      font: 500 11px var(--font-mono);
+      color: var(--color-fg-faint);
+      letter-spacing: 0.04em;
+    }
+
+    .tt-calc__readout {
+      text-align: right;
+      min-width: 140px;
+      padding-left: 24px;
+      border-left: 1px solid var(--color-border);
+    }
+    .tt-calc__readout-num {
+      font: 600 56px/1 var(--font-sans);
+      letter-spacing: var(--tracking-tight);
+      color: var(--color-brand-blue-deep);
+      display: block;
+    }
+    .tt-calc__readout-unit {
+      font: 500 13px var(--font-sans);
+      color: var(--color-fg-muted);
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* Header back link */
+    .tt-back {
+      position: fixed; top: 18px; left: 24px;
+      font: 500 14px var(--font-sans);
+      color: var(--color-fg-muted);
+      text-decoration: none; border: none;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px;
+      background: rgba(246,241,234,0.82);
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+      transition: color .2s;
+      z-index: 10;
+    }
+    .tt-back:hover { color: var(--color-fg-ink); }
+
+    /* LangToggle in top-right */
+    .tt-lang { position: fixed; top: 14px; right: 18px; z-index: 10; }
+    .lg-langtoggle { display: inline-flex; gap: 0; background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); border: 1px solid rgba(0,0,0,0.08); border-radius: 999px; padding: 3px; }
+    .lg-langtoggle__btn { font: 600 11px/1 var(--font-sans); letter-spacing: 0.06em; color: var(--color-fg-muted); background: transparent; border: 0; padding: 6px 12px; border-radius: 999px; cursor: pointer; transition: all .15s ease; }
+    .lg-langtoggle__btn.is-on { background: var(--color-fg-ink); color: #fff; }
+
+    @media (max-width: 720px) {
+      .tt-h { font-size: 36px; }
+      .tt-stage { padding: 36px 24px; }
+      .tt-phrase { font-size: 26px; max-width: 18ch; }
+      .tt-result { padding: 28px 24px; }
+      .tt-result__big { font-size: 64px; }
+      .tt-result__head { gap: 8px; flex-direction: column; align-items: flex-start; }
+      .tt-result__caption--right { text-align: left; margin-left: 0; }
+    }
+  </style>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script src="dict.js?v=1777597000000"></script>
+  <script src="i18n.js?v=1777597000000"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="LangToggle.jsx"></script>
+
+  <script type="text/babel">
+    function TypingTest() {
+      const [lang, , t] = window.i18n.useLang();
+      const PHRASE = t('tt.phrase');
+      const [typed, setTyped] = React.useState('');
+      const [startedAt, setStartedAt] = React.useState(null);
+      const [endedAt, setEndedAt] = React.useState(null);
+      const [wrongFlash, setWrongFlash] = React.useState(false);
+      const [now, setNow] = React.useState(0); // for live timer
+      const [hoursPerDay, setHoursPerDay] = React.useState(4);
+      const phraseRef = React.useRef(null);
+      const wrongTimer = React.useRef(null);
+
+      // Reset state when language changes (phrase is different)
+      React.useEffect(() => { reset(); }, [lang]);
+
+      const LINGUA_WPM = 160; // Lingua dictation speed
+
+      const isRunning = startedAt !== null && endedAt === null;
+      const isDone = endedAt !== null;
+
+      // Live timer tick
+      React.useEffect(() => {
+        if (!isRunning) return;
+        const id = setInterval(() => setNow(Date.now()), 80);
+        return () => clearInterval(id);
+      }, [isRunning]);
+
+      // Capture keystrokes globally so user doesn't need to click into a field
+      React.useEffect(() => {
+        function onKey(e) {
+          if (isDone) return;
+          // Reset shortcut
+          if (e.key === 'Escape' || (e.key === 'Enter' && isDone)) {
+            reset();
+            return;
+          }
+          // Only handle printable single-character keys (and space)
+          if (e.metaKey || e.ctrlKey || e.altKey) return;
+          if (e.key.length !== 1) return;
+
+          e.preventDefault();
+          const expected = PHRASE[typed.length];
+          if (e.key === expected) {
+            // Start the clock on the FIRST correct keypress
+            if (startedAt === null) setStartedAt(Date.now());
+            const next = typed + e.key;
+            setTyped(next);
+            if (next.length === PHRASE.length) {
+              setEndedAt(Date.now());
+            }
+          } else {
+            // Wrong character — block, flash red, shake
+            setWrongFlash(true);
+            clearTimeout(wrongTimer.current);
+            wrongTimer.current = setTimeout(() => setWrongFlash(false), 220);
+          }
+        }
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+      }, [typed, startedAt, isDone]);
+
+      function reset() {
+        setTyped('');
+        setStartedAt(null);
+        setEndedAt(null);
+        setWrongFlash(false);
+      }
+
+      // Time display
+      const elapsedMs = startedAt ? (endedAt ?? now ?? Date.now()) - startedAt : 0;
+      const elapsedS = elapsedMs / 1000;
+
+      // WPM (standard: 5 chars = 1 word)
+      const wpm = isDone && elapsedS > 0
+        ? Math.round((PHRASE.length / 5) / (elapsedS / 60))
+        : 0;
+
+      // Bar widths (cap at 220 wpm for the chart so Lingua bar fills nicely)
+      const MAX = 220;
+      const youPct = Math.max(8, Math.min(100, (wpm / MAX) * 100));
+      const avgPct = (70 / MAX) * 100;     // average typist
+      const linguaPct = (LINGUA_WPM / MAX) * 100;
+
+      // === Time-saved math ===
+      // Words in the test phrase = chars / 5 (standard WPM convention)
+      const phraseWords = PHRASE.length / 5;
+      // Time you took (seconds)
+      const youSecs = Math.round(elapsedS);
+      // Time Lingua would have taken on the same phrase (seconds)
+      const linguaSecs = Math.round((phraseWords / LINGUA_WPM) * 60);
+      // Seconds Lingua saves you on this exact phrase
+      const savedSecs = Math.max(0, youSecs - linguaSecs);
+
+      // === Weekly hours-saved calculator ===
+      // For every minute of typing at `wpm`, Lingua does the same words in (wpm/LINGUA_WPM) minutes.
+      // So time saved per minute typed = 1 - wpm/LINGUA_WPM.
+      // Daily savings = hoursPerDay * (1 - wpm/LINGUA_WPM); weekly = * 5 workdays.
+      const ratio = wpm > 0 ? Math.max(0, 1 - wpm / LINGUA_WPM) : 0;
+      const weeklyHoursSaved = hoursPerDay * 5 * ratio;
+
+      // === Scenario copy — flips based on the user's WPM ===
+      let scenarioCopy = '';
+      if (wpm > 0 && wpm < 35) scenarioCopy = t('tt.scenario.slow');
+      else if (wpm >= 35 && wpm <= 90) scenarioCopy = t('tt.scenario.mid');
+      else if (wpm > 90) scenarioCopy = t('tt.scenario.fast');
+
+      // Status string
+      let status = t('tt.status.ready');
+      if (isRunning) status = `${t('tt.status.recording')} · ${elapsedS.toFixed(1)}s`;
+      if (isDone) status = `${t('tt.status.done')} · ${elapsedS.toFixed(1)}s`;
+
+      const metaCls = 'tt-meta' + (isRunning ? ' is-running' : '') + (isDone ? ' is-done' : '');
+      const phraseCls = 'tt-phrase' + (wrongFlash ? ' is-wrong' : '') + (isDone ? ' is-done' : '');
+
+      return (
+        <React.Fragment>
+          <a className="tt-back" href="index.html">{t('tt.back')}</a>
+          <div className="tt-lang"><LangToggle /></div>
+          <div className="tt-page">
+            <p className="tt-eyebrow">{t('tt.eyebrow')}</p>
+            <h1 className="tt-h">{t('tt.h.a')}<em>{t('tt.h.em')}</em>{t('tt.h.b')}</h1>
+            <p className="tt-sub">{t('tt.sub')}</p>
+
+            <div className="tt-stage">
+              <div className={metaCls}>
+                <span><span className="tt-meta__dot" />{status}</span>
+                <span>{typed.length} / {PHRASE.length} {t('tt.chars')}</span>
+              </div>
+
+              <div ref={phraseRef} className={phraseCls}>
+                {(() => {
+                  // Split into [word, space, word, space, ...] but keep absolute char index
+                  const out = [];
+                  let i = 0;
+                  const tokens = PHRASE.split(/(\s+)/); // keep whitespace
+                  tokens.forEach((tok, ti) => {
+                    if (tok === '') return;
+                    if (/^\s+$/.test(tok)) {
+                      // Render space as its own char span (so caret can land on it)
+                      const ch = tok;
+                      const idx = i;
+                      let cls = 'tt-phrase__char';
+                      if (idx < typed.length) cls += ' is-done';
+                      else if (idx === typed.length) cls += ' is-current';
+                      out.push(<span key={'s'+ti} className={cls}>{'\u00a0'}</span>);
+                      i += 1;
+                    } else {
+                      const wordChars = [];
+                      for (let k = 0; k < tok.length; k++) {
+                        const idx = i + k;
+                        let cls = 'tt-phrase__char';
+                        if (idx < typed.length) cls += ' is-done';
+                        else if (idx === typed.length) cls += ' is-current';
+                        wordChars.push(<span key={k} className={cls}>{tok[k]}</span>);
+                      }
+                      out.push(<span key={'w'+ti} className="tt-phrase__word">{wordChars}</span>);
+                      i += tok.length;
+                    }
+                  });
+                  return out;
+                })()}
+              </div>
+
+              <p className="tt-hint">
+                {isDone
+                  ? <>{t('tt.hint.done.a')}<kbd>Esc</kbd>{t('tt.hint.done.b')}</>
+                  : <>{t('tt.hint.go')}</>
+                }
+              </p>
+
+              {/* Slow, gentle "scroll down for results" cue. Only renders once
+                  the test is complete — fades in, then breathes a 3.4s loop so
+                  it never feels demanding. Clickable shortcut to the result. */}
+              {isDone && (
+                <button
+                  type="button"
+                  className="tt-scrollcue"
+                  aria-label={t('tt.scrollcue')}
+                  onClick={() => {
+                    const el = document.querySelector('.tt-result');
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                >
+                  <span className="tt-scrollcue__label">{t('tt.scrollcue')}</span>
+                  <span className="tt-scrollcue__arrow" aria-hidden="true">
+                    <svg width="22" height="26" viewBox="0 0 22 26" fill="none">
+                      <path d="M11 2 L11 20 M3 13 L11 21 L19 13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                </button>
+              )}
+            </div>
+
+            <div className={'tt-result' + (isDone ? ' is-shown' : '')}>
+              <div className="tt-result__head">
+                <div className="tt-result__col">
+                  <div>
+                    <span className="tt-result__big">{wpm}</span>{' '}
+                    <span className="tt-result__unit">{t('tt.unit')}</span>
+                  </div>
+                  {scenarioCopy && (
+                    <p className="tt-result__scenario">{scenarioCopy}</p>
+                  )}
+                </div>
+                <div className="tt-result__col" style={{alignItems: 'flex-end'}}>
+                  <div>
+                    <span className="tt-result__big tt-result__big--lingua">{LINGUA_WPM}</span>{' '}
+                    <span className="tt-result__unit">{t('tt.unit')}</span>
+                  </div>
+                  <p className="tt-result__caption tt-result__caption--right">
+                    {t('tt.lingua.cap.a')}{Math.max(1, Math.round(LINGUA_WPM / Math.max(1, wpm)))}{t('tt.lingua.cap.b')}
+                  </p>
+                </div>
+              </div>
+
+              <p className="tt-saved">
+                {t('tt.saved.a')}<span className="tt-saved__big">{youSecs}{t('tt.saved.took')}</span>{t('tt.saved.b')}<span className="tt-saved__big">{linguaSecs}{t('tt.saved.spoken')}</span>{t('tt.saved.c')}<strong>{t('tt.saved.bold.a')}{savedSecs}{t('tt.saved.bold.b')}</strong>
+              </p>
+
+              <div className="tt-bars">
+                <Bar label={t('tt.bar.you')} value={wpm} pct={youPct} variant="you" unit={t('tt.bar.unit')} />
+                <Bar label={t('tt.bar.avg')} value={70} pct={avgPct} variant="avg" unit={t('tt.bar.unit')} />
+                <Bar label={t('tt.bar.lingua')} value={LINGUA_WPM} pct={linguaPct} variant="lingua" unit={t('tt.bar.unit')} />
+              </div>
+
+              <div className="tt-calc">
+                <p className="tt-calc__h">{t('tt.calc.h')}</p>
+                <p className="tt-calc__lede">{t('tt.calc.lede.a')}<em>{t('tt.calc.lede.em')}{hoursPerDay} {hoursPerDay === 1 ? t('tt.calc.lede.h') : t('tt.calc.lede.hs')}</em>{t('tt.calc.lede.b')}</p>
+                <div className="tt-calc__row">
+                  <div className="tt-calc__slider-wrap">
+                    <div className="tt-calc__slider-label">
+                      <span>{t('tt.calc.label')}</span>
+                      <span className="tt-calc__slider-val">{hoursPerDay}h</span>
+                    </div>
+                    <input
+                      type="range"
+                      className="tt-calc__slider"
+                      min="1" max="10" step="1"
+                      value={hoursPerDay}
+                      onChange={e => setHoursPerDay(Number(e.target.value))}
+                    />
+                    <div className="tt-calc__ticks">
+                      <span>1h</span><span>4h</span><span>10h</span>
+                    </div>
+                  </div>
+                  <div className="tt-calc__readout">
+                    <span className="tt-calc__readout-num">{weeklyHoursSaved.toFixed(1)}</span>
+                    <span className="tt-calc__readout-unit">{t('tt.calc.unit')}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="tt-result__cta">
+                <a className="lg-btn lg-btn--blue" href="#">{t('tt.cta.dl')}</a>
+                <button className="lg-btn lg-btn--ghost" onClick={reset}>{t('tt.cta.again')}</button>
+              </div>
+            </div>
+          </div>
+        </React.Fragment>
+      );
+    }
+
+    function Bar({ label, value, pct, variant, unit }) {
+      return (
+        <div className="tt-bar">
+          <div className="tt-bar__label">
+            <span>{label}</span>
+            <span className="tt-bar__num">{value} {unit}</span>
+          </div>
+          <div className="tt-bar__track">
+            <div
+              className={'tt-bar__fill tt-bar__fill--' + variant}
+              style={{ width: pct + '%' }}
+            />
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<TypingTest />);
+  </script>
+</body>
+</html>

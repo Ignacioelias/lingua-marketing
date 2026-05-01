@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" fill="none" aria-hidden="true">
+  <g fill="#3791bf">
+    <rect x="6" y="46" width="13" height="24" rx="6.5" ry="6.5"></rect>
+    <rect x="24" y="28" width="13" height="42" rx="6.5" ry="6.5"></rect>
+    <rect x="42" y="10" width="13" height="60" rx="6.5" ry="6.5"></rect>
+    <rect x="60" y="34" width="13" height="36" rx="6.5" ry="6.5"></rect>
+  </g>
+  <text x="92" y="58" font-family="Geist, Inter, system-ui, sans-serif" font-size="44" font-weight="600" fill="#0e1116" letter-spacing="-1.2">Lingua</text>
+</svg>

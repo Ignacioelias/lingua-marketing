@@ -1,0 +1,170 @@
+/* ============================================================
+   Lingua Design System — Colors & Type
+   Inspired by the warm, soft, voice-first aesthetic of
+   wisprflow.ai. Lingua's brand layers:
+     - Cream / warm-paper backgrounds
+     - Deep ink for body text
+     - Electric blue ("Lingua Blue") as the singular accent
+     - Soft serif italics for emphasis (à la "Flow for *Sales*")
+   ============================================================ */
+
+/* ---------- Webfonts (Google Fonts substitutes) ----------------
+   Wispr's site uses a custom semi-grotesque sans (resembling
+   Söhne / GT Walsheim) plus an italic serif for emphasized
+   feature names. We approximate with:
+     • Geist  → primary UI sans-serif
+     • Instrument Serif → italic emphasis serif
+     • Geist Mono → mono / numeric
+   Flag: substitute fonts. Replace the @font-face URLs below
+         with proper Söhne/Söhne Schmal licenses if available.
+---------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap');
+
+:root {
+  /* ============= Color Tokens ============= */
+
+  /* Brand */
+  --color-brand-blue:       #3791bf;   /* Lingua Blue — softer teal-blue */
+  --color-brand-blue-deep:  #266d92;   /* hover/press */
+  --color-brand-blue-soft:  #d6e8f2;   /* tints, callouts */
+
+  /* Surfaces (warm cream / paper, like Wispr's about & feature pages) */
+  --color-bg-cream:    #f6f1ea;        /* primary page background */
+  --color-bg-cream-2:  #ede5d9;        /* secondary cards on cream */
+  --color-bg-paper:    #ffffff;        /* white card on cream */
+  --color-bg-ink:      #0e1116;        /* near-black for dark sections */
+  --color-bg-ink-2:    #1a1f26;
+  --color-bg-mist:     #f4f6f9;        /* cool neutral panel */
+
+  /* Foreground / ink */
+  --color-fg-ink:      #0e1116;        /* primary text */
+  --color-fg-ink-2:    #2c3340;        /* body */
+  --color-fg-muted:    #5b6675;        /* secondary text */
+  --color-fg-faint:    #8a93a3;        /* hints, captions */
+  --color-fg-on-dark:  #f6f1ea;        /* text on ink */
+  --color-fg-on-dark-2:#9aa3b2;
+
+  /* Borders + dividers */
+  --color-border:      #e7dfd0;        /* hairline on cream */
+  --color-border-strong: #cfc6b3;
+  --color-border-mist: #e5e9ef;        /* hairline on white */
+
+  /* Semantic */
+  --color-success:     #1d9d6c;
+  --color-warn:        #d18a17;
+  --color-danger:      #d8453d;
+  --color-info:        var(--color-brand-blue);
+
+  /* Highlight + waveform accents */
+  --color-accent-coral: #ff6b4a;       /* warm pop, used sparingly */
+  --color-accent-glow:  #6b8eff;       /* gradient stop for mic glow */
+
+  /* Elevation / shadow */
+  --shadow-xs:  0 1px 2px rgba(14,17,22,0.04);
+  --shadow-sm:  0 2px 8px rgba(14,17,22,0.06);
+  --shadow-md:  0 8px 24px rgba(14,17,22,0.08);
+  --shadow-lg:  0 24px 60px rgba(14,17,22,0.12);
+  --shadow-card-cream: 0 1px 0 #fff inset, 0 8px 32px rgba(58,42,16,0.06);
+  --shadow-pop: 0 12px 36px rgba(37,99,255,0.22);
+
+  /* Radii */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-pill: 999px;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  /* ============= Typography Tokens ============= */
+  --font-sans:   'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-serif:  'Instrument Serif', 'Times New Roman', Georgia, serif;
+  --font-mono:   'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Display & headings — large, tight, slight negative tracking */
+  --type-display-1: 600 84px/0.95 var(--font-sans);   /* hero */
+  --type-display-2: 600 64px/1.02 var(--font-sans);
+  --type-h1:        600 48px/1.08 var(--font-sans);
+  --type-h2:        600 36px/1.12 var(--font-sans);
+  --type-h3:        600 28px/1.18 var(--font-sans);
+  --type-h4:        600 22px/1.24 var(--font-sans);
+  --type-h5:        500 18px/1.32 var(--font-sans);
+
+  /* Body */
+  --type-lead:      400 22px/1.45 var(--font-sans);
+  --type-body:      400 17px/1.55 var(--font-sans);
+  --type-body-sm:   400 15px/1.5 var(--font-sans);
+  --type-caption:   400 13px/1.4 var(--font-sans);
+
+  /* Labels — slight weight, sometimes uppercased */
+  --type-label:     500 14px/1.2 var(--font-sans);
+  --type-eyebrow:   500 12px/1.2 var(--font-sans);
+  --letter-eyebrow: 0.14em;
+
+  /* Mono */
+  --type-mono:      400 14px/1.5 var(--font-mono);
+
+  /* Letter spacing tweaks */
+  --tracking-tight:  -0.025em;
+  --tracking-snug:   -0.015em;
+  --tracking-base:    0;
+  --tracking-wide:    0.04em;
+  --tracking-eyebrow: 0.14em;
+}
+
+/* ============= Semantic element styles ============= */
+html, body {
+  background: var(--color-bg-cream);
+  color: var(--color-fg-ink);
+  font: var(--type-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, .h1 { font: var(--type-h1); letter-spacing: var(--tracking-tight); }
+h2, .h2 { font: var(--type-h2); letter-spacing: var(--tracking-tight); }
+h3, .h3 { font: var(--type-h3); letter-spacing: var(--tracking-snug); }
+h4, .h4 { font: var(--type-h4); letter-spacing: var(--tracking-snug); }
+h5, .h5 { font: var(--type-h5); }
+
+.display-1 { font: var(--type-display-1); letter-spacing: var(--tracking-tight); }
+.display-2 { font: var(--type-display-2); letter-spacing: var(--tracking-tight); }
+
+p, .body { font: var(--type-body); color: var(--color-fg-ink-2); text-wrap: pretty; }
+.lead    { font: var(--type-lead); color: var(--color-fg-ink-2); }
+.body-sm { font: var(--type-body-sm); color: var(--color-fg-ink-2); }
+.caption { font: var(--type-caption); color: var(--color-fg-muted); }
+
+/* The "Flow for *Sales*" italic-serif emphasis pattern.
+   Lingua adopts this verbatim for feature & section names. */
+.emphasis,
+em.emphasis,
+.serif-italic {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.eyebrow {
+  font: var(--type-eyebrow);
+  letter-spacing: var(--letter-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-fg-muted);
+}
+
+code, pre, .mono { font: var(--type-mono); }
+
+a { color: var(--color-fg-ink); text-decoration: none; border-bottom: 1px solid currentColor; }
+a:hover { color: var(--color-brand-blue); }

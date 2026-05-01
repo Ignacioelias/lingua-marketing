@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Microsoft Teams">
+  <defs>
+    <linearGradient id="tm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5b5fc7"></stop>
+      <stop offset="100%" stop-color="#4346a8"></stop>
+    </linearGradient>
+  </defs>
+  <rect x="20" y="20" width="216" height="216" rx="32" fill="url(#tm)"></rect>
+  
+  <circle cx="180" cy="92" r="22" fill="#ffffff" opacity="0.55"></circle>
+  
+  <rect x="60" y="76" width="124" height="104" rx="10" fill="#ffffff"></rect>
+  <text x="122" y="158" text-anchor="middle" font-family="&#39;Segoe UI&#39;, system-ui, sans-serif" font-weight="700" font-size="84" fill="#4346a8">T</text>
+</svg>

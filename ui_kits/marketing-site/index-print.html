@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lingua — Print</title>
+  <link rel="icon" type="image/svg+xml" href="assets/lingua-mark.svg" />
+  <link rel="stylesheet" href="../../colors_and_type.css" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* ==== Print-mode overrides ==== */
+    @page { size: A4; margin: 14mm 12mm; }
+
+    /* Force colors and backgrounds to print */
+    *, *::before, *::after {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    /* Kill all motion. Keeping styles, just freezing them. */
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    /* The sticky nav becomes a normal block in print */
+    .lg-nav {
+      position: static !important;
+      background: var(--color-bg-cream) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    /* Page-break rhythm: one major section per page */
+    .lg-hero,
+    .lg-apps,
+    .lg-tone,
+    .lg-values,
+    .lg-personas,
+    .lg-letters,
+    .lg-cta-band {
+      break-inside: avoid;
+    }
+    .lg-apps,
+    .lg-values,
+    .lg-personas,
+    .lg-letters,
+    .lg-cta-band,
+    .lg-footer {
+      break-before: page;
+    }
+
+    /* Trim section vertical padding so each fits a printed page */
+    @media print {
+      html, body { background: var(--color-bg-cream) !important; }
+      .lg-hero       { padding: 24px 24px 16px !important; }
+      .lg-hero-anim  { height: 360px !important; margin-top: 24px !important; }
+      .lg-apps,
+      .lg-values,
+      .lg-personas,
+      .lg-letters,
+      .lg-cta-band   { padding: 32px 24px !important; }
+      .lg-tone       { margin-top: 32px !important; }
+      .lg-footer     { padding: 24px 24px 18px !important; }
+
+      /* Hide things that don't make sense in a static document */
+      .lg-hero__caret,
+      .lg-hero-anim__cursor,
+      .lg-hero-anim__dot { display: none !important; }
+
+      /* Avoid splitting cards */
+      .lg-value, .lg-letter, .lg-personas__panel, .lg-tone__card {
+        break-inside: avoid;
+      }
+
+      /* Modal / fixed overlays — never appear in print */
+      .lg-roles-modal { display: none !important; }
+    }
+
+    /* Static hero title — show the final headline (no typewriter) */
+    .lg-hero__title .lg-hero__caret { display: none; }
+  </style>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="Nav.jsx"></script>
+  <script type="text/babel" src="AppGrid.jsx"></script>
+  <script type="text/babel" src="ValueCards.jsx"></script>
+  <script type="text/babel" src="PersonaTabs.jsx"></script>
+  <script type="text/babel" src="LoveLetters.jsx"></script>
+  <script type="text/babel" src="CTABand.jsx"></script>
+  <script type="text/babel" src="ContactModal.jsx"></script>
+  <script type="text/babel" src="Footer.jsx"></script>
+
+  <script type="text/babel">
+    // PRINT version of the Hero — same visual language, no animation. Uses
+    // the final state of the title and a representative still of the hero
+    // animation (curve text + waveform pill + transcript card).
+    function HeroPrint() {
+      const TESTIMONIALS = [
+        "I write entire chapters while pacing the living room.",
+        "My wrist's chronic tendinitis barely bothers me anymore.",
+        "I went from three thousand words a day to almost six thousand, effortlessly.",
+      ];
+      return (
+        <section className="lg-hero">
+          <div className="lg-eyebrow">Our mission</div>
+          <h1 className="lg-hero__title">
+            <span className="lg-hero__typed">Less keyboard</span>
+            <span className="lg-hero__tail">.<br />More <em className="emphasis">speak</em>.</span>
+          </h1>
+          <p className="lg-hero__sub">
+            The voice-to-text AI that turns what you say into clear, polished writing — in every app you use.
+          </p>
+          <div className="lg-hero__platforms">
+            <span><img src="../../assets/icon-apple.svg" width="14" height="14" alt="" /> Mac</span>
+            <span><img src="../../assets/icon-windows.svg" width="14" height="14" alt="" /> Windows</span>
+          </div>
+          <div className="lg-hero__ctas">
+            <a className="lg-btn lg-btn--blue" href="typing-test.html">Start typing test</a>
+          </div>
+          <p className="lg-hero__fine">See how much time Lingua saves you. Takes about 30 seconds.</p>
+
+          <div className="lg-hero-anim" aria-hidden="true">
+            <svg
+              className="lg-hero-anim__svg"
+              viewBox="0 0 1200 320"
+              preserveAspectRatio="xMidYMid meet"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <path
+                  id="lg-anim-path"
+                  fill="none"
+                  d="M -300 140 C 60 30, 280 10, 450 100 C 580 170, 640 220, 720 220 C 800 220, 860 170, 990 100 C 1160 10, 1380 30, 1700 140"
+                />
+                <linearGradient id="lg-anim-fade" x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
+                  <stop offset="0%"   stopColor="#0e1116" stopOpacity="0" />
+                  <stop offset="10%"  stopColor="#0e1116" stopOpacity="0.65" />
+                  <stop offset="40%"  stopColor="#0e1116" stopOpacity="0.65" />
+                  <stop offset="46%"  stopColor="#0e1116" stopOpacity="0.12" />
+                  <stop offset="54%"  stopColor="#0e1116" stopOpacity="0.12" />
+                  <stop offset="60%"  stopColor="#0e1116" stopOpacity="0.85" />
+                  <stop offset="90%"  stopColor="#0e1116" stopOpacity="0.85" />
+                  <stop offset="100%" stopColor="#0e1116" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <text className="lg-hero-anim__text" fill="url(#lg-anim-fade)">
+                <textPath href="#lg-anim-path" startOffset="-12%">
+                  {TESTIMONIALS.join("   ·   ") + "   ·   " + TESTIMONIALS.join("   ·   ") + "   ·   "}
+                </textPath>
+              </text>
+            </svg>
+
+            <div className="lg-hero-anim__pill">
+              <div className="lg-hero-anim__wave">
+                {[6, 14, 22, 18, 10, 20, 14, 8, 16, 22, 18, 12, 8, 18, 14, 6].map((h, i) => (
+                  <span key={i} style={{ height: h + 'px', opacity: 0.85 }} />
+                ))}
+              </div>
+            </div>
+
+            <div className="lg-hero-anim__transcript">
+              <div className="lg-hero-anim__transcript-head">
+                <span className="lg-hero-anim__dot" />
+                <span className="lg-hero-anim__app">Lingua  ·  transcribing</span>
+              </div>
+              <div className="lg-hero-anim__transcript-body">
+                <p className="lg-hero-anim__line lg-hero-anim__line--age2">{TESTIMONIALS[0]}</p>
+                <p className="lg-hero-anim__line lg-hero-anim__line--age1">{TESTIMONIALS[1]}</p>
+                <p className="lg-hero-anim__line lg-hero-anim__line--age0">{TESTIMONIALS[2]}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    function App() {
+      return (
+        <React.Fragment>
+          <Nav />
+          <main>
+            <HeroPrint />
+            <AppGrid />
+            <ValueCards />
+            <PersonaTabs />
+            <LoveLetters />
+            <CTABand />
+          </main>
+          <Footer />
+        </React.Fragment>
+      );
+    }
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+
+    // Auto-print once fonts + Babel transforms have settled.
+    (async () => {
+      try {
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
+      } catch (_) {}
+      // Give React + layout a beat.
+      await new Promise(r => setTimeout(r, 500));
+      window.print();
+    })();
+  </script>
+</body>
+</html>
