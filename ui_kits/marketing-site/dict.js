@@ -1101,7 +1101,7 @@ window.I18N_DICT = {
     'pricing.tier.pro.name':            'Lingua Pro',
     'pricing.tier.pro.priceMonthly':    '9 €',
     'pricing.tier.pro.priceAnnual':     '10 €',
-    'pricing.tier.pro.priceMonthlyOld': '15 €',
+    'pricing.tier.pro.priceMonthlyOld': '20 €',
     'pricing.tier.pro.priceAnnualOld':  '20 €',
     'pricing.tier.pro.priceUnit':       '/ usuario / mes',
     'pricing.tier.pro.priceUnitAnnual': '/ usuario / mes',
