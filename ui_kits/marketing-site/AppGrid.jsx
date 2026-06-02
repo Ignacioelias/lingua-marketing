@@ -26,17 +26,41 @@ function AppGrid() {
     <section className="lg-apps" id="apps">
       <h2 className="lg-section__title">{t('apps.title.a')}<em className="emphasis">{t('apps.title.em')}</em>{t('apps.title.b')}</h2>
       <p className="lg-section__sub">{t('apps.sub')}</p>
-      <div className="lg-apps__grid">
-        {apps.map(a => (
-          <div className="lg-apps__cell" key={a.label} title={a.label}>
-            <img src={a.src} alt={a.label} />
+      {(() => {
+        // Split icons across two counter-rotating orbit rings. Each icon
+        // orbits on its own ring via one CSS keyframe; negative animation-delay
+        // distributes them evenly, and the keyframe keeps them upright.
+        const inner = apps.slice(0, 6);
+        const outer = apps.slice(6);
+        const ring = (a, i, n, r, dur, cls) => (
+          <span
+            className={`lg-orbit__icon ${cls}`}
+            key={a.label}
+            title={a.label}
+            style={{ '--r': r, '--dur': dur, '--delay': `-${(i / n * parseFloat(dur)).toFixed(2)}s` }}
+          >
+            <img src={a.src} alt={a.label} loading="lazy" />
+          </span>
+        );
+        return (
+          <div className="lg-apps__stage" data-reveal>
+            <div className="lg-orbit">
+              <div className="lg-orbit__core">
+                <span className="lg-orbit__pulse" aria-hidden="true" />
+                <svg className="lg-orbit__mic" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="9" y="2" width="6" height="12" rx="3" />
+                  <path d="M5 10a7 7 0 0 0 14 0" />
+                  <line x1="12" y1="19" x2="12" y2="22" />
+                </svg>
+                <span className="lg-orbit__core-label">{t('apps.any.eb')}</span>
+              </div>
+              {inner.map((a, i) => ring(a, i, inner.length, '150px', '40s', 'lg-orbit__icon--in'))}
+              {outer.map((a, i) => ring(a, i, outer.length, '250px', '58s', 'lg-orbit__icon--out'))}
+            </div>
           </div>
-        ))}
-        <div className="lg-apps__cell lg-apps__cell--any" title={t('apps.any.eb')}>
-          <span className="lg-apps__any-eb">{t('apps.any.eb')}</span>
-          <span className="lg-apps__any-sub">{t('apps.any.sub')}</span>
-        </div>
-      </div>
+        );
+      })()}
 
       <div className="lg-tone">
         <div className="lg-tone__intro">

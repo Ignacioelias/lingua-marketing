@@ -276,31 +276,128 @@ body { background: var(--color-bg-cream); color: var(--color-fg-ink); font: var(
   .lg-hero-anim__persona::after { width: 10px; height: 10px; }
 }
 
-/* ---------- App grid ---------- */
-.lg-apps { padding: 96px 24px; max-width: 1100px; margin: 0 auto; text-align: center; }
-.lg-apps__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px; max-width: 880px; margin: 0 auto; }
-.lg-apps__cell { aspect-ratio: 1; background: #fff; border: 1px solid var(--color-border); border-radius: 16px; display: flex; align-items: center; justify-content: center; transition: all .2s; }
-.lg-apps__cell:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.lg-apps__cell img { width: 56%; height: 56%; object-fit: contain; }
-
-/* ---------- "Any app you use" — small grid cell that mirrors the others ---------- */
-.lg-apps__cell--any {
-  flex-direction: column;
-  gap: 2px;
-  text-align: center;
-  background: var(--color-bg-cream);
-  padding: 8px;
+/* ---------- Scroll reveal (see reveal.js) ---------- */
+.lg-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity .7s cubic-bezier(.22, 1, .36, 1),
+              transform .7s cubic-bezier(.22, 1, .36, 1);
+  transition-delay: var(--rd, 0s);
+  will-change: opacity, transform;
 }
-.lg-apps__cell--any:hover { background: #fff; }
-.lg-apps__any-eb {
+.lg-reveal.is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .lg-reveal { opacity: 1 !important; transform: none !important; transition: none; }
+}
+
+/* ---------- App orbit (apps "fly" around a listening core) ---------- */
+.lg-apps { padding: 96px 24px; max-width: 1100px; margin: 0 auto; text-align: center; }
+
+.lg-apps__stage {
+  position: relative;
+  height: 580px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 12px auto 0;
+}
+.lg-orbit { position: relative; width: 580px; height: 580px; }
+
+/* faint guide rings (decorative) */
+.lg-orbit::before,
+.lg-orbit::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.lg-orbit::before { width: 300px; height: 300px; border: 1px dashed rgba(55, 145, 191, 0.22); }
+.lg-orbit::after  { width: 500px; height: 500px; border: 1px dashed rgba(14, 17, 22, 0.06); }
+
+/* central "listening" core */
+.lg-orbit__core {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 38%, #ffffff, var(--color-bg-cream));
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  z-index: 3;
+}
+.lg-orbit__pulse {
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  animation: lg-orbit-pulse 2.8s ease-out infinite;
+}
+@keyframes lg-orbit-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(55, 145, 191, 0.30); }
+  70%  { box-shadow: 0 0 0 30px rgba(55, 145, 191, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(55, 145, 191, 0); }
+}
+.lg-orbit__mic { width: 38px; height: 38px; color: var(--color-brand-blue); }
+.lg-orbit__core-label {
   font: 600 12px/1.1 var(--font-sans);
   color: var(--color-brand-blue-deep);
   letter-spacing: -0.01em;
+  max-width: 96px;
+  text-align: center;
 }
-.lg-apps__any-sub {
-  font: 400 10px/1.2 var(--font-sans);
-  color: var(--color-fg-ink-2);
-  letter-spacing: -0.005em;
+
+/* orbiting icon: one keyframe orbits it AND keeps it upright; negative
+   animation-delay (set inline) distributes icons around the ring. */
+.lg-orbit__icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 56px;
+  height: 56px;
+  margin: -28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 15px;
+  box-shadow: var(--shadow-sm);
+  animation: lg-orbit-spin var(--dur, 46s) linear infinite;
+  animation-delay: var(--delay, 0s);
+  will-change: transform;
+  transition: box-shadow .2s, border-color .2s;
+}
+.lg-orbit__icon img { width: 58%; height: 58%; object-fit: contain; }
+.lg-orbit__icon--out { animation-direction: reverse; }
+
+@keyframes lg-orbit-spin {
+  from { transform: rotate(0deg)   translateX(var(--r)) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(var(--r)) rotate(-360deg); }
+}
+
+/* hover the constellation → pause so the eye can land; icons lift */
+.lg-orbit:hover .lg-orbit__icon { animation-play-state: paused; }
+.lg-orbit__icon:hover {
+  border-color: var(--color-brand-blue);
+  box-shadow: var(--shadow-md);
+  z-index: 4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lg-orbit__icon, .lg-orbit__pulse { animation: none; }
+}
+
+@media (max-width: 680px) {
+  .lg-apps__stage { height: 380px; }
+  .lg-orbit { transform: scale(0.62); }
 }
 
 /* ---------- App-aware tone (under app grid) ---------- */
@@ -604,3 +701,13 @@ html { scroll-behavior: smooth; }
 @media (max-width: 760px) {
   .lg-langtoggle { margin-right: 0; }
 }
+
+/* ---------- Micro-interaction polish ---------- */
+.lg-value { transition: transform .22s cubic-bezier(.22,1,.36,1), box-shadow .22s, border-color .22s; }
+.lg-value:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-brand-blue-soft);
+}
+.lg-tone__card { transition: transform .22s cubic-bezier(.22,1,.36,1), box-shadow .22s; }
+.lg-tone__card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
